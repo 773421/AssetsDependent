@@ -204,7 +204,7 @@ namespace Assets.Dependent
         /// <summary>
         /// 打印节点引用关系
         /// </summary>
-        [MenuItem("Dependent/AssetNodes/打印节点数据")]
+        [MenuItem("Dependent/AssetNodes/打印节点数据 #3")]
         public static void PrintAssetNode() {
             var filePath = Application.dataPath;
             filePath = filePath.Substring(0, filePath.Length - 6) + "/Logs/assetNodes.log";

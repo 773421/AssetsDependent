@@ -96,7 +96,7 @@ namespace Assets.Chart
             Color shadowCol = new Color(0, 0, 0, 0.06f);
             for (int i = 0; i < 3; i++) // Draw a shadow
                 Handles.DrawBezier(startPos, endPos, startTan, endTan, shadowCol, null, (i + 1) * 5);
-            Handles.DrawBezier(startPos, endPos, startTan, endTan, Color.black, null, 1);
+            Handles.DrawBezier(startPos, endPos, startTan, endTan, Color.white, null, 1);
         }
     }
 }

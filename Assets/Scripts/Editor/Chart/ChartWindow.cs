@@ -8,7 +8,7 @@ namespace Assets.Chart
 {
     public class ChartWindow:EditorWindow
     {
-        [MenuItem("Dependent/被依赖关系图")]
+        [MenuItem("Dependent/被依赖关系图 #2")]
         static void OpenChartWindow() {
             var window = EditorWindow.GetWindow<ChartWindow>();
             window.Init();

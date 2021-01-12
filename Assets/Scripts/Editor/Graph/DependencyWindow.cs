@@ -6,7 +6,7 @@ namespace Assets.Graph
     public class DependencyWindow : EditorWindow
     {
         public GraphDirector graphDirector = new GraphDirector();
-        [MenuItem("Dependent/依赖关系图")]
+        [MenuItem("Dependent/依赖关系图  #1")]
         static void DependenceWindow()
         {
             DependencyWindow window = EditorWindow.GetWindow<DependencyWindow>();
