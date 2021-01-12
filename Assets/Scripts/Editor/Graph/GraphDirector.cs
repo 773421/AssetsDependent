@@ -5,37 +5,25 @@ namespace Assets.Graph
 {
     public class GraphDirector:System.IDisposable
     {
-        private List<AssetGraph> graphNodeList = new List<AssetGraph>();
+        public List<AssetGraph> mGraphNodeList = new List<AssetGraph>();
         public void CreateGraph(Object[] objs) {
-            graphNodeList.Clear();
+            mGraphNodeList.Clear();
             foreach (var gbo in objs)
             {
                 var assetPath = AssetDatabase.GetAssetPath(gbo);
-                graphNodeList.Add(new AssetGraph(assetPath));
+                mGraphNodeList.Add(new AssetGraph(assetPath));
             }
 
-            var nCount = graphNodeList.Count;
-            var winheight = 500f;
-            var graphHeight = winheight / nCount;
-            Rect rect = new Rect(0, 0, 800f, graphHeight);
-            foreach (var graph in graphNodeList)
+            foreach (var graph in mGraphNodeList)
             {
-                graph.BuildGraph(rect);
-                rect.y = rect.height;
+                Vector2 pos = new Vector2(Random.Range(200, 824), Random.Range(100, 440));
+                graph.BuildGraph(pos);
             }
         }
 
         public void Dispose()
         {
-            graphNodeList.Clear();
-        }
-
-        public void DrawGraph()
-        {
-            foreach (IGraph graph in graphNodeList)
-            {
-                graph.DrawGraph();
-            }
+            mGraphNodeList.Clear();
         }
     }
 }

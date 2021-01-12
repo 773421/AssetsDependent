@@ -65,7 +65,7 @@ namespace Assets.Chart
         /// 绘制节点图
         /// </summary>
         /// <param name="id"></param>
-        public void DrawChart(int id) {
+        public void DrawChart() {
             GUI.DragWindow();
             mNode.Draw();
             Handles.DrawLine(lineStart, lineEnd);
@@ -73,6 +73,9 @@ namespace Assets.Chart
                 node.Draw();
             }
             
+        }
+        public void DoWindow(int id) {
+            this.DrawChart();
         }
         /// <summary>
         /// 绘制节点图关联曲线
