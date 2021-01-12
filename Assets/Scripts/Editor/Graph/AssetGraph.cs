@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace Assets.Graph
 {
-    public class AssetGraph : IGraph
+    public class AssetGraph
     {
         private static int idGen = 1;
         public int id { get; private set; } = idGen++;
@@ -18,14 +18,18 @@ namespace Assets.Graph
         /// <summary>
         /// 存放父节点和子节点
         /// </summary>
-        private List<INode> nodeList = new List<INode>();
+        private List<INode> parentList = new List<INode>();
+        private List<INode> childList = new List<INode>();
         const float nodeWidth = 100;
         const float nodeHeight = 20;
         const float vSpan = 30f;
         const float hSpan = 50f;
         public Vector2 mSize;
         public Rect mRect;
-        public string Name { get; private set; }
+        public Rect mParentRect;
+        public Rect mChildRect;
+        public Node mCurNode;
+        public string Name { get;private set; }
         public AssetGraph(string assetPath) {
 
             this.mAssetNode = AssetNode.Get(assetPath);
@@ -36,104 +40,86 @@ namespace Assets.Graph
             if (null == mAssetNode) {
                 return;
             }
-            int nChild = mAssetNode.mQuoteNodes.Count;
-            int nParent = mAssetNode.mQuotedNodes.Count;
-            float height = (nParent > nChild ? nParent : nChild) *(vSpan + nodeHeight);
-            float width = nodeWidth;
-            if (nChild > 0 && nParent > 0)
-            {
-                width = nodeWidth * 3 + hSpan * 2;
-            }
-            else if (nChild > 0 || nParent > 0) {
-                width = nodeWidth * 2 + hSpan * 1;
-            }
-            width += 100;
-            mRect = new Rect(pos.x + hSpan * 2, pos.y +  vSpan * 2, width, height);
+            mCurNode = new Node(mAssetNode);
+            mCurNode.BuildGraph();
+            this.Name = mCurNode.Name;
 
+            parentList.Clear();
+            childList.Clear();
+            var parents = CreateParentNodes(mAssetNode.mQuotedNodes);
+            var childs = CreateParentNodes(mAssetNode.mQuoteNodes);
+            parentList.AddRange(parents);
+            childList.AddRange(childs);
+            float width = 100f;
+            float height = 50;
+            mRect = new Rect(pos.x + hSpan * 2, pos.y + vSpan * 2, width, height);
 
-            var curNodeRect = new Rect((mRect.width - nodeWidth) * 0.5f, (mRect.height - nodeHeight) * 0.5f,nodeWidth, nodeHeight);
-            var curNode = new Node(mAssetNode);
-            curNode.BuildGraph(curNodeRect);
-            this.Name = curNode.Name;
-
-            nodeList.Clear();
-            var parents = CreateParentNodes(curNodeRect);
-            var childs = CreateChildNodes(curNodeRect);
-            nodeList.Add(curNode);
-
-            foreach (var p in parents) {
-                nodeList.Add(p);
-                nodeList.Add(new ParentNodeLinker(p, curNode));
-            }
-            foreach (var c in childs)
-            {
-                nodeList.Add(c);
-                nodeList.Add(new ChildNodeLinker(curNode, c));
-            }
+            mParentRect = new Rect(mRect.x - mRect.width - hSpan * 2, mRect.y, width, height * 3);
+            mChildRect = new Rect(mRect.x + mRect.width + hSpan * 2, mRect.y, width, height * 3);
         }
         /// <summary>
         /// 创建父节点图
         /// </summary>
         /// <param name="rect"></param>
         /// <returns></returns>
-        private List<Node> CreateParentNodes(Rect rect) {
+        private List<Node> CreateParentNodes(List<AssetNode> nodes) {
             List<Node> nodeLiset = new List<Node>();
-            foreach (var childNode in mAssetNode.mQuotedNodes)
+            foreach (var childNode in nodes)
             {
                 var gNode = new Node(childNode);
                 nodeLiset.Add(gNode);
             }
-            int nCount = nodeLiset.Count;
-            Rect parentRect = new Rect(rect.x - (hSpan + nodeWidth), rect.y + nodeHeight * 0.5f - (nodeHeight * nCount + vSpan * (nCount - 1)) * 0.5f, nodeWidth, nodeHeight);
             foreach (var node in nodeLiset)
             {
-                node.BuildGraph(parentRect);
-                parentRect.y += nodeHeight + vSpan;
+                node.BuildGraph();
 
             }
             return nodeLiset;
         }
-        /// <summary>
-        /// 创建子节点图
-        /// </summary>
-        /// <param name="rect"></param>
-        /// <returns></returns>
-        private List<Node> CreateChildNodes(Rect rect) {
-            List<Node> nodeLiset = new List<Node>();
-            foreach (var childNode in mAssetNode.mQuoteNodes)
-            {
-                var gNode = new Node(childNode);
-                nodeLiset.Add(gNode);
-            }
-            int nCount = nodeLiset.Count;
-            Rect parentRect = new Rect(rect.x + (hSpan + nodeWidth), rect.y + nodeHeight * 0.5f - (nodeHeight * nCount + vSpan * (nCount - 1)) * 0.5f, nodeWidth, nodeHeight);
-            foreach (var node in nodeLiset)
-            {
-                node.BuildGraph(parentRect);
-                parentRect.y += nodeHeight + vSpan;
-            }
-            return nodeLiset;
-        }
-        public void DrawGraph()
+       
+        private Vector2 scrollPos;
+        private Vector2 mScrollChilds;
+        private Vector2 mScrollParents;
+        public void DrawGraph(int id)
         {
-            if (nodeList.Count > 0)
+            if (null != mCurNode)
             {
-                foreach (var node in nodeList)
-                {
-                    node.DrawNode();
-                }
+                scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(mRect.width), GUILayout.Height(mRect.height));
+                mCurNode.DrawNode();
+                EditorGUILayout.EndScrollView();
+                GUI.DragWindow();
             }
         }
-        public void DoWnidow(int id) {
-            this.DrawGraph();
+        public void DrawChilds(int id)
+        {
+            mScrollChilds = EditorGUILayout.BeginScrollView(mScrollChilds, GUILayout.Width(mChildRect.width), GUILayout.Height(mChildRect.height));
+            foreach (var node in childList)
+            {
+                node.DrawNode();
+            }
+            EditorGUILayout.EndScrollView();
             GUI.DragWindow();
+        }
+        public void DrawParent(int id)
+        {
+            mScrollParents = EditorGUILayout.BeginScrollView(mScrollParents, GUILayout.Width(mParentRect.width), GUILayout.Height(mParentRect.height));
+            foreach (var node in parentList)
+            {
+                node.DrawNode();
+            }
+            EditorGUILayout.EndScrollView();
+            GUI.DragWindow();
+        }
+        public void DrawLine() {
+            NodeUtil.DrawNodeCurve(mParentRect, mRect, Color.blue);
+            NodeUtil.DrawNodeCurve(mRect, mChildRect, Color.green);
         }
         public void Dispose()
         {
-            foreach (INode node in nodeList) {
+            foreach (INode node in parentList) {
                 node.Dispose();
             }
-            nodeList.Clear();
+            parentList.Clear();
         }
     }
 }

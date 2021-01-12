@@ -12,7 +12,6 @@ namespace Assets.Chart
     {
         public string assetPath;
         public Object mAsset;
-        public Rect mRect;
         public string Name {
             get {
                 if (null != mAsset) {
@@ -32,11 +31,8 @@ namespace Assets.Chart
             }
             mAsset = AssetDatabase.LoadMainAssetAtPath(assetPath);
         }
-        public void SetRect(Rect rect) {
-            this.mRect = rect;
-        }
         public void Draw() {
-            EditorGUI.ObjectField(mRect, mAsset, mAsset.GetType(), false);
+            EditorGUILayout.ObjectField(mAsset, mAsset.GetType(), false);
         }
         public void Dispose()
         {

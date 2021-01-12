@@ -22,7 +22,7 @@ namespace Assets.Chart
         }
         protected static Rect GetRect() {
 
-            return new Rect(Random.Range(200, 824), Random.Range(100, 440), 100f, 100f);
+            return new Rect(Random.Range(200, 824), Random.Range(100, 440), 120f, 150f);
         }
         internal static NodeChart GetOrCreateNodeChart(AssetNode anode) {
             NodeChart nc = null;

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System;
+
 namespace Assets.Dependent
 {
     /// <summary>
@@ -118,9 +120,14 @@ namespace Assets.Dependent
             mQuoteNodes = null;
         }
 
-        public static void Create(List<string> assets) {
+        public static void Create(List<string> assets, Action<float, string> OnProgress=null) {
+            int nCount = 0;
             foreach (var asset in assets) {
+                nCount += 1;
                 AssetNode.GetOrCreteNode(asset);
+                if (null != OnProgress) {
+                    OnProgress(nCount * 1f / assets.Count, asset);
+                }
             }
         }
         private static AssetNode GetOrCreteNode(string assetPath)
@@ -143,11 +150,19 @@ namespace Assets.Dependent
         /// <summary>
         /// 收集所有节点的资源和依赖资源
         /// </summary>
-        public static void CollectRes() {
+        public static void CollectRes(Action<float, string> OnProgress) {
+            List<AssetNode> nodeList = new List<AssetNode>();
             var iter = mAllNodes.GetEnumerator();
             while (iter.MoveNext())
             {
-                iter.Current.Value.Collect();
+                nodeList.Add(iter.Current.Value);
+            }
+            for (int index=0; index < nodeList.Count; index++) {
+                var node = nodeList[index];
+                if (null != OnProgress) {
+                    OnProgress(index * 1f / nodeList.Count, node.mAssetPath);
+                }
+                node.Collect();
             }
         }
         /// <summary>

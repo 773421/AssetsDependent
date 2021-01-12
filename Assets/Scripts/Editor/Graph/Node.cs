@@ -23,9 +23,8 @@ namespace Assets.Graph
         {
             this.node = _node;
         }
-        public void BuildGraph(Rect _rect)
+        public void BuildGraph()
         {
-            this.mRect = _rect;
             if (null != this.node)
             {
                 mAsset = AssetDatabase.LoadMainAssetAtPath(this.node.mAssetPath);
@@ -38,7 +37,7 @@ namespace Assets.Graph
         {
             if (null != mAsset)
             {
-                EditorGUI.ObjectField(mRect, mAsset, mAsset.GetType(), false);
+                EditorGUILayout.ObjectField(mAsset, mAsset.GetType(), false);
             }
             else {
                 Debug.LogWarning($"{node.mAssetPath}[asset is null]");

@@ -19,7 +19,7 @@ namespace Assets.Dependent {
         /// 总的资源节点
         /// </summary>
         
-        [MenuItem("Dependent/收集资源")]
+        [MenuItem("Dependent/收集资源 #c")]
         public static void CollectAssets() {
             Director.CollectAssets(Application.dataPath);
         }
@@ -28,17 +28,32 @@ namespace Assets.Dependent {
         /// </summary>
         /// <param name="root"></param>
         private void CollectAssets(string root) {
-            AssetNode.Clean();
-            var assets = Directory.GetFiles(root.Substring(root.Length - 6), @"*", SearchOption.AllDirectories).Where(s => {
-                return AssetUtil.IsVaild(s);
-            });
-            var assetList = assets.ToList();
-            int nCount = assetList.Count;
-            for (int index = 0; index < nCount; index++) {
-                assetList[index] = assetList[index].Replace("\\","/");
+            try
+            {
+                AssetNode.Clean();
+                var assets = Directory.GetFiles(root.Substring(root.Length - 6), @"*", SearchOption.AllDirectories).Where(s =>
+                {
+                    return AssetUtil.IsVaild(s);
+                });
+                var assetList = assets.ToList();
+                int nCount = assetList.Count;
+                for (int index = 0; index < nCount; index++)
+                {
+                    assetList[index] = assetList[index].Replace("\\", "/");
+                    EditorUtility.DisplayProgressBar("路径转换", assetList[index], index * 1f / nCount);
+                }
+                AssetNode.Create(assetList, (p, f) =>
+                {
+                    EditorUtility.DisplayProgressBar("节点创建", f, p);
+                });
+                AssetNode.CollectRes((p, f) =>
+                {
+                    EditorUtility.DisplayProgressBar("收集依赖资源", f, p);
+                });
             }
-            AssetNode.Create(assetList);
-            AssetNode.CollectRes();
+            finally {
+                EditorUtility.ClearProgressBar();
+            }
         }
         public void Dispose()
         {

@@ -24,10 +24,12 @@ namespace Assets.Graph
 
         void OnGUI()
         {
-            //graphDirector.DrawGraph();
             BeginWindows();
             foreach (var graph in graphDirector.mGraphNodeList) {
-                graph.mRect = GUI.Window(graph.id, graph.mRect, graph.DoWnidow, graph.Name);
+                graph.mRect = GUI.Window(graph.id, graph.mRect, graph.DrawGraph, graph.Name);
+                graph.mChildRect = GUI.Window(graph.id*1000+1, graph.mChildRect, graph.DrawChilds, "children");
+                graph.mParentRect = GUI.Window(graph.id*1000+2, graph.mParentRect, graph.DrawParent, "parents");
+                graph.DrawLine();
             }
             EndWindows();
         }
