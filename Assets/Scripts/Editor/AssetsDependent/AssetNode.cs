@@ -118,6 +118,8 @@ namespace Assets.Dependent
         {
             mQuoteNodes.Clear();
             mQuoteNodes = null;
+            mQuotedNodes.Clear();
+            mQuotedNodes = null;
         }
 
         public static void Create(List<string> assets, Action<float, string> OnProgress=null) {
@@ -168,7 +170,7 @@ namespace Assets.Dependent
         /// <summary>
         /// 重现计算节点间的依赖关系，例如,A->B,B->C,A->C=>
         /// </summary>
-        [MenuItem("Dependent/AssetNodes/重新计算节点间依赖关系")]
+        [MenuItem("Tools/Dependent/AssetNodes/重新计算节点间依赖关系")]
         public static void CalculateDependency()
         {
             var iter = AssetNode.GetAllNode().GetEnumerator();
@@ -219,7 +221,7 @@ namespace Assets.Dependent
         /// <summary>
         /// 打印节点引用关系
         /// </summary>
-        [MenuItem("Dependent/AssetNodes/打印节点数据 #3")]
+        [MenuItem("Tools/Dependent/AssetNodes/打印节点数据 #3")]
         public static void PrintAssetNode() {
             var filePath = Application.dataPath;
             filePath = filePath.Substring(0, filePath.Length - 6) + "/Logs/assetNodes.log";

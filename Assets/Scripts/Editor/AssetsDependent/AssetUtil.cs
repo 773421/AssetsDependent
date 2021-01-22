@@ -12,7 +12,7 @@ namespace Assets.Dependent
         /// 是否为有效资源
         /// </summary>
         public static bool IsVaild(string assetPath) {
-            if (assetPath.EndsWith(".meta") || assetPath.EndsWith(".cs")) {
+            if (assetPath.EndsWith(".meta")) {
                 return false;
             }
             return true;

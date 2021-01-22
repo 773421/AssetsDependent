@@ -6,7 +6,7 @@ namespace Assets.Graph
     public class DependencyWindow : EditorWindow
     {
         public GraphDirector graphDirector = new GraphDirector();
-        [MenuItem("Dependent/依赖关系图  #1")]
+        [MenuItem("Tools/Dependent/依赖关系图  #1")]
         static void DependenceWindow()
         {
             DependencyWindow window = EditorWindow.GetWindow<DependencyWindow>();
@@ -27,8 +27,14 @@ namespace Assets.Graph
             BeginWindows();
             foreach (var graph in graphDirector.mGraphNodeList) {
                 graph.mRect = GUI.Window(graph.id, graph.mRect, graph.DrawGraph, graph.Name);
-                graph.mChildRect = GUI.Window(graph.id*1000+1, graph.mChildRect, graph.DrawChilds, "children");
-                graph.mParentRect = GUI.Window(graph.id*1000+2, graph.mParentRect, graph.DrawParent, "parents");
+                if (graph.ChildCount > 0)
+                {
+                    graph.mChildRect = GUI.Window(graph.id * 1000 + 1, graph.mChildRect, graph.DrawChilds, "children");
+                }
+                if (graph.parentCount > 0)
+                {
+                    graph.mParentRect = GUI.Window(graph.id * 1000 + 2, graph.mParentRect, graph.DrawParent, "parents");
+                }
                 graph.DrawLine();
             }
             EndWindows();

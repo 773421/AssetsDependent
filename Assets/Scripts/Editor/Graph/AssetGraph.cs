@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace Assets.Graph
 {
-    public class AssetGraph
+    public class AssetGraph:IDisposable
     {
         private static int idGen = 1;
         public int id { get; private set; } = idGen++;
@@ -18,10 +18,10 @@ namespace Assets.Graph
         /// <summary>
         /// 存放父节点和子节点
         /// </summary>
-        private List<INode> parentList = new List<INode>();
-        private List<INode> childList = new List<INode>();
-        const float nodeWidth = 100;
-        const float nodeHeight = 20;
+        private List<INode> mParentNodeList = new List<INode>();
+        private List<INode> mChildNodeList = new List<INode>();
+        public int ChildCount { get { return mChildNodeList.Count; } }
+        public int parentCount { get { return mParentNodeList.Count; } }
         const float vSpan = 30f;
         const float hSpan = 50f;
         public Vector2 mSize;
@@ -44,18 +44,18 @@ namespace Assets.Graph
             mCurNode.BuildGraph();
             this.Name = mCurNode.Name;
 
-            parentList.Clear();
-            childList.Clear();
+            mParentNodeList.Clear();
+            mChildNodeList.Clear();
             var parents = CreateParentNodes(mAssetNode.mQuotedNodes);
             var childs = CreateParentNodes(mAssetNode.mQuoteNodes);
-            parentList.AddRange(parents);
-            childList.AddRange(childs);
+            mParentNodeList.AddRange(parents);
+            mChildNodeList.AddRange(childs);
             float width = 100f;
             float height = 50;
             mRect = new Rect(pos.x + hSpan * 2, pos.y + vSpan * 2, width, height);
 
-            mParentRect = new Rect(mRect.x - mRect.width - hSpan * 2, mRect.y, width, height * 3);
-            mChildRect = new Rect(mRect.x + mRect.width + hSpan * 2, mRect.y, width, height * 3);
+            mParentRect = new Rect(mRect.x - mRect.width - hSpan * 2, mRect.y, width * 2, height * 3);
+            mChildRect = new Rect(mRect.x + mRect.width + hSpan * 2, mRect.y, width * 2, height * 3);
         }
         /// <summary>
         /// 创建父节点图
@@ -80,6 +80,8 @@ namespace Assets.Graph
         private Vector2 scrollPos;
         private Vector2 mScrollChilds;
         private Vector2 mScrollParents;
+        private bool disposedValue;
+
         public void DrawGraph(int id)
         {
             if (null != mCurNode)
@@ -93,7 +95,7 @@ namespace Assets.Graph
         public void DrawChilds(int id)
         {
             mScrollChilds = EditorGUILayout.BeginScrollView(mScrollChilds, GUILayout.Width(mChildRect.width), GUILayout.Height(mChildRect.height));
-            foreach (var node in childList)
+            foreach (var node in mChildNodeList)
             {
                 node.DrawNode();
             }
@@ -103,7 +105,7 @@ namespace Assets.Graph
         public void DrawParent(int id)
         {
             mScrollParents = EditorGUILayout.BeginScrollView(mScrollParents, GUILayout.Width(mParentRect.width), GUILayout.Height(mParentRect.height));
-            foreach (var node in parentList)
+            foreach (var node in mParentNodeList)
             {
                 node.DrawNode();
             }
@@ -111,15 +113,53 @@ namespace Assets.Graph
             GUI.DragWindow();
         }
         public void DrawLine() {
-            NodeUtil.DrawNodeCurve(mParentRect, mRect, Color.blue);
-            NodeUtil.DrawNodeCurve(mRect, mChildRect, Color.green);
+            if (parentCount > 0)
+            {
+                NodeUtil.DrawNodeCurve(mParentRect, mRect, Color.blue);
+            }
+            if (ChildCount > 0)
+            {
+                NodeUtil.DrawNodeCurve(mRect, mChildRect, Color.green);
+            }
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    
+                }
+                if (null != mChildNodeList)
+                {
+                    mChildNodeList.Clear();
+                }
+                if (null != mParentNodeList)
+                {
+                    mParentNodeList.Clear();
+                }
+                if (null != mCurNode)
+                {
+                    mCurNode.Dispose();
+                    mCurNode = null;
+                }
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
+        ~AssetGraph()
+        {
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: false);
+        }
+
         public void Dispose()
         {
-            foreach (INode node in parentList) {
-                node.Dispose();
-            }
-            parentList.Clear();
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

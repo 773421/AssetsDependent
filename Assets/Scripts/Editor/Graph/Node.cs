@@ -10,7 +10,8 @@ namespace Assets.Graph
     {
         public AssetNode node = null;
         protected Object mAsset = null;
-        public Rect mRect { get; set; }
+        private bool disposedValue;
+
         public string Name {
             get {
                 if (null != mAsset) {
@@ -44,9 +45,30 @@ namespace Assets.Graph
             }
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                }
+                this.mAsset = null;
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
+        ~Node()
+        {
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: false);
+        }
+
         public void Dispose()
         {
-            this.mAsset = null;
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: true);
+            System.GC.SuppressFinalize(this);
         }
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Assets.Chart
 {
-    public class NodeChart
+    public class NodeChart:System.IDisposable
     {
         static public int idGen = 1;
         public int id { private set; get; }
@@ -15,7 +15,7 @@ namespace Assets.Chart
         /// </summary>
         protected Node mNode;
         public Rect mRect;
-        protected List<Node> mNodeList = new List<Node>();
+        protected List<Node> mChildNodeList = new List<Node>();
         /// <summary>
         /// 节点父类图
         /// </summary>
@@ -37,7 +37,7 @@ namespace Assets.Chart
 
             foreach (var anode in mAssetNode.mQuoteNodes) {
                 var cnode = new Node(anode.mAssetPath);
-                mNodeList.Add(cnode);
+                mChildNodeList.Add(cnode);
             }
 
             //获取父节点图
@@ -50,6 +50,8 @@ namespace Assets.Chart
             mRect = rect;
         }
         Vector2 scrollPos;
+        private bool disposedValue;
+
         /// <summary>
         /// 绘制节点图
         /// </summary>
@@ -58,7 +60,7 @@ namespace Assets.Chart
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Width(mRect.width), GUILayout.Height(mRect.height));
             mNode.Draw();
             EditorGUILayout.LabelField("children:");
-            foreach (var node in mNodeList) {
+            foreach (var node in mChildNodeList) {
                 node.Draw();
             }
             EditorGUILayout.EndScrollView();
@@ -76,6 +78,46 @@ namespace Assets.Chart
             {
                 NodeUtil.DrawNodeCurve(chart.mRect, mRect, Color.black);
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                   
+                }
+                if (null != mChildNodeList)
+                {
+                    mChildNodeList.Clear();
+                }
+                if (null != mParentChart)
+                {
+                    mParentChart.Clear();
+                }
+                if (null != mNode)
+                {
+                    mNode = null;
+                }
+                // TODO: 释放未托管的资源(未托管的对象)并替代终结器
+                // TODO: 将大型字段设置为 null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: 仅当“Dispose(bool disposing)”拥有用于释放未托管资源的代码时才替代终结器
+         ~NodeChart()
+         {
+             // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+             Dispose(disposing: false);
+         }
+
+        public void Dispose()
+        {
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: true);
+            System.GC.SuppressFinalize(this);
         }
     }
 }

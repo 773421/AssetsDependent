@@ -3,11 +3,11 @@ using UnityEditor;
 using System.Collections.Generic;
 namespace Assets.Graph
 {
-    public class GraphDirector:System.IDisposable
+    public class GraphDirector
     {
         public List<AssetGraph> mGraphNodeList = new List<AssetGraph>();
         public void CreateGraph(Object[] objs) {
-            mGraphNodeList.Clear();
+            this.Clean();
             foreach (var gbo in objs)
             {
                 var assetPath = AssetDatabase.GetAssetPath(gbo);
@@ -20,10 +20,13 @@ namespace Assets.Graph
                 graph.BuildGraph(pos);
             }
         }
-
-        public void Dispose()
-        {
+        public void Clean() {
             mGraphNodeList.Clear();
+            System.GC.Collect();
+        }
+        ~GraphDirector()
+        {
+            this.Clean();
         }
     }
 }

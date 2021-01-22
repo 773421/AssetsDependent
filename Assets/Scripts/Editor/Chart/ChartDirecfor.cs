@@ -8,10 +8,11 @@ using UnityEditor;
 
 namespace Assets.Chart
 {
-    public class ChartDirecfor : System.IDisposable
+    public class ChartDirecfor
     {
         public Dictionary<AssetNode,NodeChart> mNodeCharts = new Dictionary<AssetNode, NodeChart>();
         static public ChartDirecfor _inst;
+
         static public ChartDirecfor Inst {
             get {
                 if (null == _inst) {
@@ -34,8 +35,8 @@ namespace Assets.Chart
             return nc;
         }
         public void CreateChart(Object[] objs) {
+            this.Clean();
             NodeChart.idGen = 1;
-            mNodeCharts.Clear();
             HashSet<NodeChart> chartSet = new HashSet<NodeChart>();
             foreach (var obj in objs) {
                 var assetPath = AssetDatabase.GetAssetPath(obj);
@@ -46,9 +47,16 @@ namespace Assets.Chart
                 }
             }
         }
-        public void Dispose()
+
+        protected virtual void Clean()
         {
             mNodeCharts.Clear();
+            System.GC.Collect();
+        }
+
+        ~ChartDirecfor()
+        {
+            Clean();
         }
     }
 }

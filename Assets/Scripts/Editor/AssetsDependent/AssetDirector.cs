@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Linq;
 namespace Assets.Dependent { 
-    public class AssetDirector:IDisposable
+    public class AssetDirector
     {
         static private AssetDirector _director;
         static public AssetDirector Director {
@@ -19,7 +19,7 @@ namespace Assets.Dependent {
         /// 总的资源节点
         /// </summary>
         
-        [MenuItem("Dependent/收集资源 #c")]
+        [MenuItem("Tools/Dependent/收集资源 #9")]
         public static void CollectAssets() {
             Director.CollectAssets(Application.dataPath);
         }
@@ -55,7 +55,7 @@ namespace Assets.Dependent {
                 EditorUtility.ClearProgressBar();
             }
         }
-        public void Dispose()
+       ~AssetDirector()
         {
             AssetNode.Clean();
         }
