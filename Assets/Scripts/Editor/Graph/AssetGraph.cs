@@ -15,6 +15,9 @@ namespace Assets.Graph
         /// 打AssetBundle，需要去除父节点资源和子节点资源间接引用关系，以及循环依赖关系
         /// </summary>
         private AssetNode mAssetNode;
+        public AssetNode GetNode() {
+           return mAssetNode;
+        }
         /// <summary>
         /// 存放父节点和子节点
         /// </summary>

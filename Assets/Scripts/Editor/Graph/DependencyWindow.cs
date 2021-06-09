@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.IO;
 
 namespace Assets.Graph
 {
@@ -24,6 +25,32 @@ namespace Assets.Graph
 
         void OnGUI()
         {
+            if (GUILayout.Button("导出相关Prefab", GUILayout.MaxWidth(100), GUILayout.Height(30)))
+            {
+                foreach (var graph in graphDirector.mGraphNodeList)
+                {
+                    string filePath = $"{Application.dataPath}/../{graph.Name}.txt";
+                    using (var fs = File.OpenWrite(filePath)) {
+                        var writer = new StreamWriter(fs);
+                        var node = graph.GetNode();
+                        foreach (var p in node.mQuotedNodes) {
+                            if (p.mAssetPath.EndsWith(".prefab"))
+                            {
+                                writer.WriteLine(p.mAssetPath);
+                            }
+                        }
+                        writer.WriteLine();
+                        foreach (var p in node.mQuoteNodes)
+                        {
+                            if (p.mAssetPath.EndsWith(".prefab"))
+                            {
+                                writer.WriteLine(p.mAssetPath);
+                            }
+                        }
+                        writer.Flush();
+                    }
+                }
+            }
             BeginWindows();
             foreach (var graph in graphDirector.mGraphNodeList) {
                 graph.mRect = GUI.Window(graph.id, graph.mRect, graph.DrawGraph, graph.Name);
